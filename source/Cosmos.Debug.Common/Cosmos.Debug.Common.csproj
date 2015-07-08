@@ -133,6 +133,8 @@
     <Compile Include="SourceInfo.cs" />
     <Compile Include="SQL.cs" />
     <Compile Include="SqliteBulkCopy.cs" />
+    <Compile Include="TracingDriver\TracingCommand.cs" />
+    <Compile Include="TracingDriver\TracingConnection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

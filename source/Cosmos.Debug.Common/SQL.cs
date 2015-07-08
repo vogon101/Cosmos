@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Data.SQLite;
@@ -7,9 +8,9 @@ using System.IO;
 
 namespace Cosmos.Debug.Common {
   public class SQL {
-    public readonly SQLiteConnection Connection;
+      public readonly IDbConnection Connection;
 
-    public SQL(SQLiteConnection aConnection)
+    public SQL(IDbConnection aConnection)
     {
       Connection = aConnection;
     }
@@ -51,11 +52,11 @@ namespace Cosmos.Debug.Common {
       } else {
         Exec("CREATE UNIQUE INDEX Idx" + xIdxName + " ON " + aTable + "(" + aCol + ");");
       }
-    }    
+    }
 
     internal void CreateDB()
     {
-        ExecuteAssemblyResource("SQLite.sql");          
+        ExecuteAssemblyResource("SQLite.sql");
     }
 
     /// <summary>

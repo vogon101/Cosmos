@@ -1,8 +1,2 @@
-﻿[DebugConnector.cs]
-indent_size = 4
-
-[DebugConnectorEdison.cs]
-indent_size = 4
-
-[DebugConnectorStream.cs]
+﻿[*.cs]
 indent_size = 4

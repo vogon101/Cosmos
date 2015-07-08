@@ -6,6 +6,7 @@ using System.Diagnostics.SymbolStore;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Cosmos.Debug.Common.TracingDriver;
 using Dapper;
 using DapperExtensions;
 using DapperExtensions.Mapper;
@@ -52,7 +53,8 @@ namespace Cosmos.Debug.Common
             public List<string> FieldNames = new List<string>();
         }
 
-        protected SQLiteConnection mConnection;
+        protected TracingConnection mConnection;
+        protected SQLiteConnection mRealConnection;
         protected string mDbName;
         // Dont use DbConnectionStringBuilder class, it doesnt work with LocalDB properly.
         //protected mDataSouce = @".\SQLEXPRESS";
@@ -74,10 +76,12 @@ namespace Cosmos.Debug.Common
             aCreate = !File.Exists(aPathname);
 
             // Manually register the data provider. Do not remove this otherwise the data provider doesn't register properly.
-            mConnStr = String.Format("data source={0};journal mode=Memory;synchronous=Off;foreign keys=True;BinaryGuid=false", aPathname);
+            mConnStr = String.Format("data source={0};journal mode=Memory;synchronous=Off;foreign keys=True;BinaryGuid=false;", aPathname);
             // Use the SQLiteConnectionFactory as the default database connection
             // Do not open mConnection before mEntities.CreateDatabase
-            mConnection = new SQLiteConnection(mConnStr);
+
+            mConnection = new TracingConnection(mConnStr, @"c:\Data\CosmosCI\Db", out mRealConnection);
+            //mRealConnection = new SQLiteConnection(mConnStr);
 
             DapperExtensions.DapperExtensions.DefaultMapper = typeof(PluralizedAutoClassMapper<>);
             DapperExtensions.DapperExtensions.SqlDialect = new SqliteDialect();
@@ -103,6 +107,7 @@ namespace Cosmos.Debug.Common
             {
                 mConnection.Open();
             }
+
         }
 
         public IDbConnection Connection
@@ -402,7 +407,7 @@ namespace Cosmos.Debug.Common
             {
                 if (aList.Count > 0)
                 {
-                    using (var xBulkCopy = new SqliteBulkCopy(mConnection))
+                    using (var xBulkCopy = new SqliteBulkCopy(mRealConnection))
                     {
                         xBulkCopy.DestinationTableName = aTableName;
                         #region debug
