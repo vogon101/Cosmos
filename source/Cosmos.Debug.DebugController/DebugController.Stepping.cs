@@ -19,7 +19,10 @@ namespace Cosmos.Debug
         private bool mASMSteppingOut = false;
         private int mASMSteppingOut_NumEndMethodLabelsPassed = 0;
         private bool mStepping = false;
-        
+
+        /// <summary>
+        /// Calls Continue on the debug connector
+        /// </summary>
         public void ContinueRunning()
         {
             mDbgConnector.Continue();
