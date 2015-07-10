@@ -235,6 +235,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGACompilerCrash", "..\Test
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "VGACompilerCrashBoot", "..\Tests\VGACompilerCrash\VGACompilerCrashBoot.Cosmos", "{78AC2B12-8185-4033-80F0-DA5BF874BE5E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.DebugController", "Cosmos.Debug.DebugController\Cosmos.Debug.DebugController.csproj", "{0E172969-EBFB-499C-A1DA-98F63C234299}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1180,6 +1182,18 @@ Global
 		{78AC2B12-8185-4033-80F0-DA5BF874BE5E}.Release|Mixed Platforms.Build.0 = Debug|x86
 		{78AC2B12-8185-4033-80F0-DA5BF874BE5E}.Release|x86.ActiveCfg = Debug|x86
 		{78AC2B12-8185-4033-80F0-DA5BF874BE5E}.Release|x86.Build.0 = Debug|x86
+		{0E172969-EBFB-499C-A1DA-98F63C234299}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E172969-EBFB-499C-A1DA-98F63C234299}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E172969-EBFB-499C-A1DA-98F63C234299}.Debug|Itanium.ActiveCfg = Debug|Any CPU
+		{0E172969-EBFB-499C-A1DA-98F63C234299}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{0E172969-EBFB-499C-A1DA-98F63C234299}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{0E172969-EBFB-499C-A1DA-98F63C234299}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0E172969-EBFB-499C-A1DA-98F63C234299}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E172969-EBFB-499C-A1DA-98F63C234299}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E172969-EBFB-499C-A1DA-98F63C234299}.Release|Itanium.ActiveCfg = Release|Any CPU
+		{0E172969-EBFB-499C-A1DA-98F63C234299}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{0E172969-EBFB-499C-A1DA-98F63C234299}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{0E172969-EBFB-499C-A1DA-98F63C234299}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1271,5 +1285,6 @@ Global
 		{431643CB-006C-49EF-8E0F-1540F994C936} = {F104F6BC-EF8E-4408-A786-D570D7565231}
 		{21915A7E-CC84-4836-8B87-857B6149D496} = {F104F6BC-EF8E-4408-A786-D570D7565231}
 		{78AC2B12-8185-4033-80F0-DA5BF874BE5E} = {F104F6BC-EF8E-4408-A786-D570D7565231}
+		{0E172969-EBFB-499C-A1DA-98F63C234299} = {FF5BAFDE-AE9D-438D-935A-86B33EE0A758}
 	EndGlobalSection
 EndGlobal

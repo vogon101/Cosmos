@@ -8,12 +8,13 @@ using Cosmos.Debug.Common;
 using Dapper;
 using SQLinq.Dapper;
 using SQLinq;
+using FIELD_INFO = Cosmos.Debug.Common.FIELD_INFO;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
     // An implementation of IDebugProperty2
-    // This interface represents a stack frame property, a program document property, or some other property. 
-    // The property is usually the result of an expression evaluation. 
+    // This interface represents a stack frame property, a program document property, or some other property.
+    // The property is usually the result of an expression evaluation.
     //
     // The sample engine only supports locals and parameters for functions that have symbols loaded.
     class AD7Property : IDebugProperty2
@@ -25,14 +26,6 @@ namespace Cosmos.Debug.VSDebugEngine
         const uint mArrayLengthOffset = 8;
         const uint mArrayFirstElementOffset = 16;
         private const string NULL = "null";
-
-        protected Int32 OFFSET
-        {
-            get
-            {
-                return mDebugInfo.OFFSET;
-            }
-        }
 
         public AD7Property(DebugLocalInfo localInfo, AD7Process process, AD7StackFrame stackFrame)
         {
@@ -64,7 +57,7 @@ namespace Cosmos.Debug.VSDebugEngine
             byte[] xData;
             if (m_variableInformation.IsReference)
             {
-                xData = mProcess.mDbgConnector.GetMemoryData(m_variableInformation.Pointer, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)));
+                xData = mProcess.DbgController.GetMemoryData(m_variableInformation.Pointer, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)));
                 if (xData == null)
                 {
                     propertyInfo.bstrValue = String.Format("Error! Memory data received was null!");
@@ -76,7 +69,7 @@ namespace Cosmos.Debug.VSDebugEngine
             }
             else
             {
-                xData = mProcess.mDbgConnector.GetStackData(OFFSET, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)));
+                xData = mProcess.DbgController.GetStackData(mDebugInfo.OFFSET, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)));
                 if (xData == null)
                 {
                     propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
@@ -92,7 +85,7 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             byte[] xData;
 
-            xData = mProcess.mDbgConnector.GetStackData(OFFSET, 4);
+            xData = mProcess.DbgController.GetStackData(mDebugInfo.OFFSET, 4);
             if (xData == null)
             {
                 propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
@@ -106,7 +99,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 }
                 else
                 {
-                    xData = mProcess.mDbgConnector.GetMemoryData(xPointer + mArrayLengthOffset, 4, 4);
+                    xData = mProcess.DbgController.GetMemoryData(xPointer + mArrayLengthOffset, 4, 4);
                     if (xData == null)
                     {
                         propertyInfo.bstrValue = String.Format("Error! Memory data received was null!");
@@ -177,7 +170,7 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         const uint xStringLengthOffset = 12;
                         const uint xStringFirstCharOffset = 16;
-                        xData = mProcess.mDbgConnector.GetStackData(OFFSET, 4);
+                        xData = mProcess.DbgController.GetStackData(mDebugInfo.OFFSET, 4);
                         if (xData == null)
                         {
                             propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
@@ -191,7 +184,7 @@ namespace Cosmos.Debug.VSDebugEngine
                             }
                             else
                             {
-                                xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringLengthOffset, 4, 4);
+                                xData = mProcess.DbgController.GetMemoryData(xStrPointer + xStringLengthOffset, 4, 4);
                                 if (xData == null)
                                 {
                                     propertyInfo.bstrValue = String.Format("Error! Memory data received was null!");
@@ -210,7 +203,7 @@ namespace Cosmos.Debug.VSDebugEngine
                                     }
                                     else
                                     {
-                                        xData = mProcess.mDbgConnector.GetMemoryData(xStrPointer + xStringFirstCharOffset, xStringLength * 2, 2);
+                                        xData = mProcess.DbgController.GetMemoryData(xStrPointer + xStringFirstCharOffset, xStringLength * 2, 2);
                                         if (xData == null)
                                         {
                                             propertyInfo.bstrValue = String.Format("Error! Memory data received was null!");
@@ -255,7 +248,7 @@ namespace Cosmos.Debug.VSDebugEngine
                     #region char
                     else if (mDebugInfo.TYPENAME == typeof(char).AssemblyQualifiedName)
                     {
-                        xData = mProcess.mDbgConnector.GetStackData(OFFSET, 2);
+                        xData = mProcess.DbgController.GetStackData(mDebugInfo.OFFSET, 2);
                         if (xData == null)
                         {
                             propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
@@ -268,7 +261,7 @@ namespace Cosmos.Debug.VSDebugEngine
                     }
                     else if (mDebugInfo.TYPENAME == typeof(char[]).AssemblyQualifiedName)
                     {
-                        xData = mProcess.mDbgConnector.GetStackData(OFFSET, 4);
+                        xData = mProcess.DbgController.GetStackData(mDebugInfo.OFFSET, 4);
                         if (xData == null)
                         {
                             propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
@@ -282,7 +275,7 @@ namespace Cosmos.Debug.VSDebugEngine
                             }
                             else
                             {
-                                xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + mArrayLengthOffset, 4, 4);
+                                xData = mProcess.DbgController.GetMemoryData(xArrayPointer + mArrayLengthOffset, 4, 4);
                                 if (xData == null)
                                 {
                                     propertyInfo.bstrValue = String.Format("Error! Memory data received was null!");
@@ -299,7 +292,7 @@ namespace Cosmos.Debug.VSDebugEngine
                                     }
                                     if (xDataLength > 0)
                                     {
-                                        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + mArrayFirstElementOffset, xDataLength * 2);
+                                        xData = mProcess.DbgController.GetMemoryData(xArrayPointer + mArrayFirstElementOffset, xDataLength * 2);
                                         if (xData == null)
                                         {
                                             xSB.Append(String.Format("Error! Memory data received was null!"));
@@ -452,11 +445,11 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         if (m_variableInformation.IsReference)
                         {
-                            xData = mProcess.mDbgConnector.GetMemoryData(m_variableInformation.Pointer, 4, 4);
+                            xData = mProcess.DbgController.GetMemoryData(m_variableInformation.Pointer, 4, 4);
                         }
                         else
                         {
-                            xData = mProcess.mDbgConnector.GetStackData(OFFSET, 4);
+                            xData = mProcess.DbgController.GetStackData(mDebugInfo.OFFSET, 4);
                         }
                         if (xData == null)
                         {
@@ -473,11 +466,10 @@ namespace Cosmos.Debug.VSDebugEngine
                             {
                                 try
                                 {
-                                    var mp = mProcess.mDebugInfoDb.GetFieldMap(mDebugInfo.TYPENAME);
+                                    var mp = mProcess.DbgController.GetFieldMap(mDebugInfo.TYPENAME);
                                     foreach (string str in mp.FieldNames)
                                     {
-                                        Cosmos.Debug.Common.FIELD_INFO xFieldInfo;
-                                        xFieldInfo = mProcess.mDebugInfoDb.Connection.Query(new SQLinq<Cosmos.Debug.Common.FIELD_INFO>().Where(q => q.NAME == str)).First();
+                                        var xFieldInfo = mProcess.DbgController.GetFieldInfoByName(str);
                                         var inf = new DebugLocalInfo();
                                         inf.IsReference = true;
                                         inf.Type = xFieldInfo.TYPE;
@@ -521,7 +513,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 propertyInfo.dwFields |= (enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP);
                 // If the debugger has asked for the property, or the property has children (meaning it is a pointer in the sample)
                 // then set the pProperty field so the debugger can call back when the children are enumerated.
-                //if (((dwFields & (uint)enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP) != 0) 
+                //if (((dwFields & (uint)enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP) != 0)
                 //|| (this.m_variableInformation.child != null))
                 //{
                 //    propertyInfo.pProperty = (IDebugProperty2)this;
@@ -577,14 +569,14 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         // Returns the property that describes the most-derived property of a property
-        // This is called to support object oriented languages. It allows the debug engine to return an IDebugProperty2 for the most-derived 
+        // This is called to support object oriented languages. It allows the debug engine to return an IDebugProperty2 for the most-derived
         // object in a hierarchy. This engine does not support this.
         public int GetDerivedMostProperty(out IDebugProperty2 ppDerivedMost)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        // This method exists for the purpose of retrieving information that does not lend itself to being retrieved by calling the IDebugProperty2::GetPropertyInfo 
+        // This method exists for the purpose of retrieving information that does not lend itself to being retrieved by calling the IDebugProperty2::GetPropertyInfo
         // method. This includes information about custom viewers, managed type slots and other information.
         // The sample engine does not support this.
         public int GetExtendedInfo(ref System.Guid guidExtendedInfo, out object pExtendedInfo)

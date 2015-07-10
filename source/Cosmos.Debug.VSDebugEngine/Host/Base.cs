@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
-using Cosmos.Debug.Common;
 
 namespace Cosmos.Debug.VSDebugEngine.Host {
   public abstract class Base {

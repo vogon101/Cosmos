@@ -13,16 +13,16 @@ using System.Collections.Specialized;
 using System.Windows.Forms;
 
 namespace Cosmos.Debug.VSDebugEngine {
-  // AD7Engine is the primary entrypoint object for the the debugger. 
+  // AD7Engine is the primary entrypoint object for the the debugger.
   //
   // It implements:
   //
-  // IDebugEngine2: This interface represents a debug engine (DE). It is used to manage various aspects of a debugging session, 
+  // IDebugEngine2: This interface represents a debug engine (DE). It is used to manage various aspects of a debugging session,
   // from creating breakpoints to setting and clearing exceptions.
   //
   // IDebugEngineLaunch2: Used by a debug engine (DE) to launch and terminate programs.
   //
-  // IDebugProgram3: This interface represents a program that is running in a process. Since this engine only debugs one process at a time and each 
+  // IDebugProgram3: This interface represents a program that is running in a process. Since this engine only debugs one process at a time and each
   // process only contains one program, it is implemented on the engine.
   //
   // IDebugEngineProgram2: This interface provides simultanious debugging of multiple threads in a debuggee.
@@ -50,7 +50,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     public AD7Engine() {
-      mBPMgr = new BreakpointManager(this);
+      mBPMgr = new BreakpointManager();
     }
 
     // Used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
@@ -101,13 +101,13 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
       return VSConstants.S_OK;
     }
-    
+
     int IDebugEngine2.Attach(IDebugProgram2[] rgpPrograms, IDebugProgramNode2[] rgpProgramNodes, uint aCeltPrograms, IDebugEventCallback2 ad7Callback, enum_ATTACH_REASON dwReason) {
-      // Attach the debug engine to a program. 
+      // Attach the debug engine to a program.
       //
       // Attach can either be called to attach to a new process, or to complete an attach
       // to a launched process.
-      // So could we simplify and move code from LaunchSuspended to here and maybe even 
+      // So could we simplify and move code from LaunchSuspended to here and maybe even
       // eliminate the debughost? Although I supposed DebugHost has some other uses as well.
 
       if (aCeltPrograms != 1) {
@@ -124,7 +124,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         AD7ModuleLoadEvent.Send(this, mModule, true);
 
         // Dummy main thread
-        // We dont support threads yet, but the debugger expects threads. 
+        // We dont support threads yet, but the debugger expects threads.
         // So we create a dummy object to represente our only "thread".
         mThread = new AD7Thread(this, mProcess);
         AD7LoadCompleteEvent.Send(this, mThread);
@@ -154,7 +154,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
         Callback.OnModuleLoad(mModule);
         Callback.OnSymbolSearch(mModule, xProcess.mISO.Replace("iso", "pdb"), enum_MODULE_INFO_FLAGS.MIF_SYMBOLS_LOADED);
-        // Important! 
+        // Important!
         //
         // This call triggers setting of breakpoints that exist before run.
         // So it must be called before we resume the process.
@@ -164,7 +164,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         Callback.OnThreadStart(mThread);
 
         // Not sure what this does exactly. It was commented out before
-        // but so was a lot of stuff we actually needed. If its uncommented it 
+        // but so was a lot of stuff we actually needed. If its uncommented it
         // throws:
         //  "Operation is not valid due to the current state of the object."
         //AD7EntrypointEvent.Send(this);
@@ -183,7 +183,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       // Called by the SDM to indicate that a synchronous debug event, previously sent by the DE to the SDM,
       // was received and processed. The only event the  engine sends in this fashion is Program Destroy.
       // It responds to that event by shutting down the engine.
-      // 
+      //
       // This is used in some cases - I set a BP here and it does get hit sometime during breakpoints
       // being triggered for example.
       try {
@@ -202,7 +202,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     int IDebugEngine2.CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP) {
-      // Creates a pending breakpoint in the engine. A pending breakpoint is contains all the information needed to bind a breakpoint to 
+      // Creates a pending breakpoint in the engine. A pending breakpoint is contains all the information needed to bind a breakpoint to
       // a location in the debuggee.
 
       ppPendingBP = null;
@@ -215,7 +215,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     int IDebugEngine2.DestroyProgram(IDebugProgram2 pProgram) {
-      // Informs a DE that the program specified has been atypically terminated and that the DE should 
+      // Informs a DE that the program specified has been atypically terminated and that the DE should
       // clean up all references to the program and send a program destroy event.
       //
       // Tell the SDM that the engine knows that the program is exiting, and that the
@@ -248,7 +248,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       // We don't appear to use or support this currently.
 
       // Continue is called from the SDM when it wants execution to continue in the debugee
-      // but have stepping state remain. An example is when a tracepoint is executed, 
+      // but have stepping state remain. An example is when a tracepoint is executed,
       // and the debugger does not want to actually enter break mode.
 
       var xThread = (AD7Thread)aThread;
@@ -307,16 +307,16 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     public int Step(IDebugThread2 pThread, enum_STEPKIND sk, enum_STEPUNIT Step) {
       // This method is deprecated. Use the IDebugProcess3::Step method instead.
-      
+
       mProcess.Step((enum_STEPKIND)sk);
       return VSConstants.S_OK;
     }
 
     public int ExecuteOnThread(IDebugThread2 pThread) {
-      // ExecuteOnThread is called when the SDM wants execution to continue and have 
+      // ExecuteOnThread is called when the SDM wants execution to continue and have
       // stepping state cleared.
 
-      mProcess.Continue();
+      mProcess.DbgController.Continue();
       return VSConstants.S_OK;
     }
     #endregion
@@ -331,7 +331,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       programName = null;
       return VSConstants.S_OK;
     }
-    
+
     // This method gets the Edit and Continue (ENC) update for this program. A custom debug engine always returns E_NOTIMPL
     public int GetENCUpdate(out object update) {
       // The sample engine does not participate in managed edit & continue.
@@ -339,7 +339,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       return VSConstants.S_OK;
     }
-    
+
     // Removes the list of exceptions the IDE has set for a particular run-time architecture or language.
     // We dont support exceptions in the debuggee so this method is not actually implemented.
     int IDebugEngine2.RemoveAllSetExceptions(ref Guid guidType) {
@@ -347,7 +347,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     // Removes the specified exception so it is no longer handled by the debug engine.
-    // The sample engine does not support exceptions in the debuggee so this method is not actually implemented.       
+    // The sample engine does not support exceptions in the debuggee so this method is not actually implemented.
     int IDebugEngine2.RemoveSetException(EXCEPTION_INFO[] pException) {
       // We stop on all exceptions.
       return VSConstants.S_OK;
@@ -365,7 +365,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     int IDebugEngine2.SetLocale(ushort wLangID) {
       return VSConstants.S_OK;
     }
-    // A metric is a registry value used to change a debug engine's behavior or to advertise supported functionality. 
+    // A metric is a registry value used to change a debug engine's behavior or to advertise supported functionality.
     // This method can forward the call to the appropriate form of the Debugging SDK Helpers function, SetMetric.
     int IDebugEngine2.SetMetric(string pszMetric, object varValue) {
       // The sample engine does not need to understand any metric settings.
@@ -391,7 +391,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     // The debugger calls CauseBreak when the user clicks on the pause button in VS. The debugger should respond by entering
-    // breakmode. 
+    // breakmode.
     public int CauseBreak() {
       return this.mProcess.CauseBreak();
     }
@@ -404,10 +404,10 @@ namespace Cosmos.Debug.VSDebugEngine {
       return VSConstants.E_NOTIMPL;
     }
 
-    // The properties returned by this method are specific to the program. If the program needs to return more than one property, 
-    // then the IDebugProperty2 object returned by this method is a container of additional properties and calling the 
+    // The properties returned by this method are specific to the program. If the program needs to return more than one property,
+    // then the IDebugProperty2 object returned by this method is a container of additional properties and calling the
     // IDebugProperty2::EnumChildren method returns a list of all properties.
-    // A program may expose any number and type of additional properties that can be described through the IDebugProperty2 interface. 
+    // A program may expose any number and type of additional properties that can be described through the IDebugProperty2 interface.
     // An IDE might display the additional program properties through a generic property browser user interface.
     // The sample engine does not support this
     public int GetDebugProperty(out IDebugProperty2 ppProperty) {
@@ -421,7 +421,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       return VSConstants.E_NOTIMPL;
     }
 
-    // The memory bytes as represented by the IDebugMemoryBytes2 object is for the program's image in memory and not any memory 
+    // The memory bytes as represented by the IDebugMemoryBytes2 object is for the program's image in memory and not any memory
     // that was allocated when the program was executed.
     public int GetMemoryBytes(out IDebugMemoryBytes2 ppMemoryBytes) {
       throw new Exception("The method or operation is not implemented.");
@@ -432,11 +432,11 @@ namespace Cosmos.Debug.VSDebugEngine {
       // The sample debugger does not support creating or reading mini-dumps.
       return VSConstants.E_NOTIMPL;
     }
-    
+
     // Stops all threads running in this program.
-    // This method is called when this program is being debugged in a multi-program environment. When a stopping event from some other program 
-    // is received, this method is called on this program. The implementation of this method should be asynchronous; 
-    // that is, not all threads should be required to be stopped before this method returns. The implementation of this method may be 
+    // This method is called when this program is being debugged in a multi-program environment. When a stopping event from some other program
+    // is received, this method is called on this program. The implementation of this method should be asynchronous;
+    // that is, not all threads should be required to be stopped before this method returns. The implementation of this method may be
     // as simple as calling the IDebugProgram2::CauseBreak method on this program.
     //
     // The sample engine only supports debugging native applications and therefore only has one program per-process
@@ -444,7 +444,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       throw new Exception("The method or operation is not implemented.");
     }
 
-    // WatchForExpressionEvaluationOnThread is used to cooperate between two different engines debugging 
+    // WatchForExpressionEvaluationOnThread is used to cooperate between two different engines debugging
     // the same process. The sample engine doesn't cooperate with other engines, so it has nothing
     // to do here.
     public int WatchForExpressionEvaluationOnThread(IDebugProgram2 pOriginatingProgram, uint dwTid, uint dwEvalFlags, IDebugEventCallback2 pExprCallback, int fWatch) {

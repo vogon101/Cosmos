@@ -19,11 +19,6 @@ namespace Cosmos.Debug.VSDebugEngine {
       mProcess = aProcess;
     }
 
-    string GetCurrentLocation(bool fIncludeModuleName) {
-      uint ip = this.mProcess.mCurrentAddress.HasValue ? this.mProcess.mCurrentAddress.Value : 0u;// GetThreadContext().eip;
-      return mEngine.GetAddressDescription(ip);
-    }
-
     #region IDebugThread2 Members
 
     // Determines whether the next statement can be set to the given stack frame and code context.
@@ -34,7 +29,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     // Retrieves a list of the stack frames for this thread.
     // For the sample engine, enumerating the stack frames requires walking the callstack in the debuggee for this thread
-    // and coverting that to an implementation of IEnumDebugFrameInfo2. 
+    // and coverting that to an implementation of IEnumDebugFrameInfo2.
     // Real engines will most likely want to cache this information to avoid recomputing it each time it is asked for,
     // and or construct it on demand instead of walking the entire stack.
     int IDebugThread2.EnumFrameInfo(enum_FRAMEINFO_FLAGS aFieldSpec, uint aRadix, out IEnumDebugFrameInfo2 oEnumObject) {
@@ -138,6 +133,13 @@ namespace Cosmos.Debug.VSDebugEngine {
         return EngineUtils.UnexpectedException(e);
       }
     }
+
+    string GetCurrentLocation(bool fIncludeModuleName)
+    {
+        uint ip = this.mProcess.DbgController.CurrentAddress ?? 0u;// GetThreadContext().eip;
+        return mEngine.GetAddressDescription(ip);
+    }
+
 
     // Resume a thread.
     // This is called when the user chooses "Unfreeze" from the threads window when a thread has previously been frozen.

@@ -50,7 +50,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       return true;
     }
 
-    // Get the document context for this pending breakpoint. A document context is a abstract representation of a source file 
+    // Get the document context for this pending breakpoint. A document context is a abstract representation of a source file
     // location.
     public AD7DocumentContext GetDocumentContext(uint address) {
       IDebugDocumentPosition2 docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(mBpRequestInfo.bpLocation.unionmember2));
@@ -100,14 +100,14 @@ namespace Cosmos.Debug.VSDebugEngine {
           EngineUtils.CheckOk(xDocPos.GetRange(xStartPos, xEndPos));
 
           UInt32 xAddress = 0;
-          var xDebugInfo = mEngine.mProcess.mDebugInfoDb;
 
           // We must check for DocID. This is important because in a solution that contains many projects,
           // VS will send us BPs from other Cosmos projects (and possibly non Cosmos ones, didnt look that deep)
           // but we wont have them in our doc list because it contains only ones from the currently project
           // to run.
           long xDocID;
-          if (xDebugInfo.DocumentGUIDs.TryGetValue(xDocName, out xDocID)) {
+          if (mEngine.mProcess.DbgController.TryGetDocumentIdByName(xDocName, out xDocID))
+          {
               // Find which Method the Doc, Line, Col are in.
               // Must add +1 for both Line and Col. They are 0 based, while SP ones are 1 based.
               // () around << are VERY important.. + has precedence over <<
@@ -115,21 +115,19 @@ namespace Cosmos.Debug.VSDebugEngine {
 
               try
               {
-                  var potXMethods = xDebugInfo.Connection.Query(new SQLinq<Method>().Where(x => x.DocumentID == xDocID
-                                && x.LineColStart <= xPos
-                                && x.LineColEnd >= xPos));
-                  var xMethod = potXMethods.Single();
-                  var asm = xDebugInfo.Connection.Get<AssemblyFile>(xMethod.AssemblyFileID);
+                  var xMethod = mEngine.mProcess.DbgController.GetMethodByDocumentIDAndLinePosition(xDocID, xPos, xPos);
+
+                  var asm = mEngine.mProcess.DbgController.GetAssemblyFileById(xMethod.AssemblyFileID);
 
                   // We have the method. Now find out what Sequence Point it belongs to.
-                  var xSPs = xDebugInfo.GetSequencePoints(asm.Pathname, xMethod.MethodToken);
+                  var xSPs = mEngine.mProcess.DbgController.GetSequencePoints(asm.Pathname, xMethod.MethodToken);
                   var xSP = xSPs.Single(q => q.LineColStart <= xPos && q.LineColEnd >= xPos);
 
                   // We have the Sequence Point, find the MethodILOp
-                  var xOp = xDebugInfo.Connection.Query(new SQLinq<MethodIlOp>().Where(q => q.MethodID == xMethod.ID && q.IlOffset == xSP.Offset)).First();
+                  var xOp = mEngine.mProcess.DbgController.GetFirstMethodIlOpByMethodIdAndILOffset(xMethod.ID, xSP.Offset);
 
                   // Get the address of the Label
-                  xAddress = xDebugInfo.AddressOfLabel(xOp.LabelName);
+                  xAddress = mEngine.mProcess.DbgController.GetAddressOfLabel(xOp.LabelName);
 
 
                   if (xAddress > 0)
@@ -152,7 +150,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                   }
               }
               catch(InvalidOperationException)
-              { 
+              {
                   //No elements in potXMethods sequence!
                   return VSConstants.S_FALSE;
               }
@@ -180,7 +178,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       ppErrorEnum = null;
 
       if (!CanBind()) {
-        // Called to determine if a pending breakpoint can be bound. 
+        // Called to determine if a pending breakpoint can be bound.
         // The breakpoint may not be bound for many reasons such as an invalid location, an invalid expression, etc...
         // The sample engine does not support this, but a real world engine will want to return a valid enumeration of IDebugErrorBreakpoint2.
         // The debugger will then display information about why the breakpoint did not bind to the user.
@@ -264,7 +262,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       throw new NotImplementedException();
     }
 
-    // Toggles the virtualized state of this pending breakpoint. When a pending breakpoint is virtualized, 
+    // Toggles the virtualized state of this pending breakpoint. When a pending breakpoint is virtualized,
     // the debug engine will attempt to bind it every time new code loads into the program.
     // The sample engine will does not support this.
     int IDebugPendingBreakpoint2.Virtualize(int fVirtualize) {

@@ -114,6 +114,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsmSource.cs" />
     <Compile Include="BochsSupport.cs" />
     <Compile Include="Consts.cs" />
     <Compile Include="DebugConnector.cs" />

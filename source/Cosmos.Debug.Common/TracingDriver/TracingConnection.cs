@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -53,6 +54,7 @@ namespace Cosmos.Debug.Common.TracingDriver
         private long CurrentItem = 0;
         private StreamWriter mCurrentOut;
         private readonly string mBaseDir;
+        private Stopwatch mStopwatch = new Stopwatch();
 
         internal void DoLogStart(string message)
         {
@@ -83,6 +85,7 @@ namespace Cosmos.Debug.Common.TracingDriver
                 mCurrentOut.WriteLine(Environment.StackTrace);
 
                 mCurrentOut.Flush();
+                mStopwatch.Restart();
             }
             finally
             {
@@ -102,6 +105,7 @@ namespace Cosmos.Debug.Common.TracingDriver
                 {
                     throw new ArgumentNullException("message");
                 }
+                mStopwatch.Stop();
 
                 var xLines = message.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
                 var xTimeString = DateTime.Now.ToString("HH:mm:ss.ffff");
@@ -112,6 +116,8 @@ namespace Cosmos.Debug.Common.TracingDriver
                     mCurrentOut.Write(" ");
                     mCurrentOut.WriteLine(xLine);
                 }
+                mCurrentOut.WriteLine();
+                mCurrentOut.WriteLine("Took {0}", mStopwatch.Elapsed);
                 mCurrentOut.Flush();
                 mCurrentOut.Close();
                 mCurrentOut = StreamWriter.Null;
