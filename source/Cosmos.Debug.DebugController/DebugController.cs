@@ -56,8 +56,6 @@ namespace Cosmos.Debug
         {
             mDbgConnector = null;
 
-
-
             var xParts = (null == DebugPort) ? null : DebugPort.Split(' ');
             if ((null == xParts) || (2 > xParts.Length))
             {
@@ -103,6 +101,9 @@ namespace Cosmos.Debug
             mDbgConnector.CmdChannel += DbgCmdChannel;
         }
 
+        private readonly StreamWriter mOut = new StreamWriter(@"c:\data\CosmosDebugController.log", true);
+
+
         private void Debug(string message, params object[] args)
         {
             Debug(String.Format(message, args));
@@ -111,9 +112,11 @@ namespace Cosmos.Debug
         private void Debug(string message)
         {
             // for now:
-            DbgCmdText("DEBUG: " + message);
+            DbgCmdText("DEBUG: "+ message);
+
+            var x = DateTime.Now.ToString("HH:mm:ss.ffffff ") + message;
+            mOut.WriteLine(x);
+            mOut.Flush();
         }
-
-
     }
 }

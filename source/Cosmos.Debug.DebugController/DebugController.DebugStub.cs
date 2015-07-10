@@ -159,6 +159,7 @@ namespace Cosmos.Debug
 
         public void WaitForAssemblyUpdate()
         {
+            Debug("WaitForAssemblyUpdate");
             mAsmWindow_CurrentLineUpdated.WaitOne(5000);
             mAsmWindow_NextAddress1Updated.WaitOne(5000);
             mAsmWindow_NextLine1Updated.WaitOne(5000);

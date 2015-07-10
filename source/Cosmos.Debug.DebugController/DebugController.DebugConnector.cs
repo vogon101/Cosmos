@@ -15,6 +15,7 @@ namespace Cosmos.Debug
         }
         protected void DbgCmdRegisters(byte[] aData)
         {
+            Debug("DbgCmdRegisters. aData = {" + aData.Aggregate("", (a, b) => a + " " + b.ToString("X2").ToUpper()) + "}");
             OnRegistersReceived(aData);
 
             if (aData.Length < 40)
