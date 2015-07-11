@@ -1,4 +1,4 @@
-; Generated at 7-3-2015 18:37:33
+; Generated at 11-7-2015 18:17:17
 
 DebugStub_CallerEBP dd 0
 DebugStub_CallerEIP dd 0
@@ -196,6 +196,7 @@ Mov dword [DebugStub_BreakEBP], 0
 Mov dword [DebugStub_DebugStatus], DebugStub_Const_Status_Break
 Call DebugStub_SendTrace
 
+cli
 DebugStub_Break_WaitCmd:
 Call DebugStub_ProcessCommand
 
@@ -244,6 +245,7 @@ Jmp DebugStub_Break_WaitCmd
 DebugStub_Break_Done:
 Call DebugStub_AckCommand
 Mov dword [DebugStub_DebugStatus], DebugStub_Const_Status_Run
+sti
 DebugStub_Break_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_Break_Exit
 Ret

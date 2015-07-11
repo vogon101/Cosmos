@@ -18,7 +18,9 @@ namespace Cosmos.Debug
         public byte[] GetStackData(int offset, uint length)
         {
             Debug("GetStackData. Offset = {0}, Length = {1}", offset, length);
-            return mDbgConnector.GetStackData(offset, length);
+            var xResult = mDbgConnector.GetStackData(offset, length);
+            Debug("Data:" + xResult.Aggregate("", (a, b) => a + " " + b.ToString("X2").ToUpper()));
+            return xResult;
         }
 
         public void PingDebugStub()
