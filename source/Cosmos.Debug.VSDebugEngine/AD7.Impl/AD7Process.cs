@@ -274,7 +274,7 @@ namespace Cosmos.Debug.VSDebugEngine
                         case Windows2Debugger.SetAsmBreak:
                             {
                                 string xLabel = Encoding.UTF8.GetString(aData);
-                                DbgController.SetAssemblerBreakpoint(xLabel);
+                                DbgController.SetAssemblerBreakpointAndContinueRunning(xLabel);
                             }
                             break;
 

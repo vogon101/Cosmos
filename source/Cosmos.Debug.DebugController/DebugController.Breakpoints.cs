@@ -45,7 +45,7 @@ namespace Cosmos.Debug
             mDbgConnector.DeleteBreakpoint(aRemoteId);
         }
 
-        public void SetAssemblerBreakpoint(string aLabel)
+        public void SetAssemblerBreakpointAndContinueRunning(string aLabel)
         {
             UInt32 xAddress = GetAddressOfLabel(aLabel);
             mDbgConnector.SetAsmBreakpoint(xAddress);

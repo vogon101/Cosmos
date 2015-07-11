@@ -11,36 +11,43 @@ namespace Cosmos.Debug
     {
         public byte[] GetMemoryData(uint address, uint length, int dataElementSize = 1)
         {
+            Debug("GetMemoryData. Address = 0x{0}, Length = {1}, DataElementSize = {2}", address.ToString("X"), length, dataElementSize);
             return mDbgConnector.GetMemoryData(address, length, dataElementSize);
         }
 
         public byte[] GetStackData(int offset, uint length)
         {
+            Debug("GetStackData. Offset = {0}, Length = {1}", offset, length);
             return mDbgConnector.GetStackData(offset, length);
         }
 
         public void PingDebugStub()
         {
+            Debug("PingDebugStub");
             mDbgConnector.Ping();
         }
 
         public void SendBatchEndCmd()
         {
+            Debug("SendBatchEndCmd");
             mDbgConnector.SendCmd(Vs2Ds.BatchEnd);
         }
 
         public void SendStepIntoCmd()
         {
+            Debug("SendStepIntoCmd");
             mDbgConnector.SendCmd(Vs2Ds.AsmStepInto);
         }
 
         public void SendBreakCmd()
         {
+            Debug("SendBreakCmd");
             mDbgConnector.SendCmd(Vs2Ds.Break);
         }
 
         public void RequestFullDebugStubUpdate()
         {
+            Debug("RequestFullDebugStubUpdate");
             // We catch and resend data rather than using a second serial port because
             // while this would work fine in a VM, it would require 2 serial ports
             // when real hardware is used.

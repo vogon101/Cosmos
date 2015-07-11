@@ -316,7 +316,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       // ExecuteOnThread is called when the SDM wants execution to continue and have
       // stepping state cleared.
 
-      mProcess.DbgController.ContinueRunning();
+      mProcess.DbgController.Continue();
       return VSConstants.S_OK;
     }
     #endregion
