@@ -193,7 +193,7 @@ namespace Cosmos.Debug
 
         private void DbgDebugMsg(string obj)
         {
-            Debug(obj);
+            //Debug(obj);
             OnDebugMsg(obj);
         }
 
