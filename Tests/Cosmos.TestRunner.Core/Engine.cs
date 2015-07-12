@@ -12,7 +12,7 @@ namespace Cosmos.TestRunner.Core
     public partial class Engine
     {
         // configuration: in process eases debugging, but means certain errors (like stack overflow) kill the test runner.
-        public const bool RunIL2CPUInProcess = true;
+        public const bool RunIL2CPUInProcess = false;
 
         private List<string> mKernelsToRun = new List<string>();
         public void AddKernel(string assemblyFile)

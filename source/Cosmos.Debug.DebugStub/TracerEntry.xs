@@ -17,10 +17,11 @@
 namespace DebugStub
 
 Interrupt TracerEntry {
-// This code is temporarily disabled as IRQs are not enabled right now.
-// LockOrExit
 
-	+All
+// Disable interrupts.
+ ! cli
+
++All
 // Save current ESP so we can look at the results of PushAll later
 .PushAllPtr = ESP
 .CallerEBP = EBP
@@ -56,6 +57,9 @@ EAX = EBX
 	Executing()
 
 -All
+
+// Enable interrupts again.
+! sti
 
 // Temp disabled, see comment on LockOrExit above
 // Unlock

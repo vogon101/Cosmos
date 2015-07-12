@@ -1,10 +1,12 @@
-; Generated at 11-7-2015 18:17:19
+; Generated at 11-7-2015 18:36:16
 
 
 
 
 
 DebugStub_TracerEntry:
+
+cli
 
 Pushad
 Mov [DebugStub_PushAllPtr], ESP
@@ -32,6 +34,8 @@ Mov [DebugStub_CallerEIP], EAX
 Call DebugStub_Executing
 
 Popad
+
+sti
 
 DebugStub_TracerEntry_Exit:
 IRet

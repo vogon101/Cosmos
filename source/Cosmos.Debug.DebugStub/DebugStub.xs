@@ -259,7 +259,6 @@ function Break {
     SendTrace()
 
     // Wait for a command
-    ! cli
 WaitCmd:
     // Check for common commands first
     ProcessCommand()
@@ -307,6 +306,5 @@ WaitCmd:
 Done:
     AckCommand()
     .DebugStatus = #Status_Run
-    ! sti
 }
 
