@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Cosmos.Debug.Common;
 using Dapper;
 using DapperExtensions;
@@ -11,47 +12,101 @@ namespace Cosmos.Debug
     {
         // for now, these just forward calls to the debuginfo class. This should be made more clever though....
 
-
+        private SourceInfos mCachedSourceInfos;
+        private uint? mCachedSourceInfosAddress;
         public SourceInfos GetSourceInfos(uint aAddress)
         {
             Debug("GetSourceInfos. Address = 0x{0}", aAddress.ToString("X8"));
-            return mDebugInfoDb.GetSourceInfos(aAddress);
+            if (mCachedSourceInfosAddress != null && mCachedSourceInfosAddress.Value == aAddress)
+            {
+                Debug("Returning from cache");
+                return mCachedSourceInfos;
+            }
+            mCachedSourceInfos = mDebugInfoDb.GetSourceInfos(aAddress);
+            mCachedSourceInfosAddress = aAddress;
+            return mCachedSourceInfos;
         }
 
+        private string[] mCachedLabels;
+        private uint? mCachedLabelsAddress;
         public string[] GetLabels(uint aAddress)
         {
             Debug("GetLabels. Address = 0x{0}", aAddress.ToString("X8"));
-            return mDebugInfoDb.GetLabels(aAddress);
+            if (mCachedLabelsAddress != null && mCachedLabelsAddress.Value == aAddress)
+            {
+                Debug("Returning from cache");
+                return mCachedLabels;
+            }
+            var xResult = mDebugInfoDb.GetLabels(aAddress);
+            Debug("Result.Length = {0}", xResult.Length);
+            mCachedLabels = xResult;
+            mCachedLabelsAddress = aAddress;
+            return xResult;
         }
+
+        private MethodIlOp mCachedFirstMethodIlOpByLabelName;
 
         public MethodIlOp TryGetFirstMethodIlOpByLabelName(string aLabelName)
         {
             Debug("TryGetFirstMethodIlOpByLabelName. LabelName = '{0}'", aLabelName);
+            if (mCachedFirstMethodIlOpByLabelName != null && mCachedFirstMethodIlOpByLabelName.LabelName.Equals(aLabelName, StringComparison.OrdinalIgnoreCase))
+            {
+                Debug("Returning from cache");
+                return mCachedFirstMethodIlOpByLabelName;
+            }
             var xResult = mDebugInfoDb.Connection.Query<MethodIlOp>(new SQLinq<MethodIlOp>().Where(q => q.LabelName == aLabelName)).FirstOrDefault();
+            mCachedFirstMethodIlOpByLabelName = xResult;
             Debug("IL Offset = .IL_{0}", xResult.IlOffset.ToString("X4"));
             return xResult;
         }
 
+        private Method mCachedMethod;
         public Method GetMethod(long aMethodId)
         {
             Debug("GetMethod. MethodID = {0}", aMethodId);
+            if (mCachedMethod != null && mCachedMethod.ID == aMethodId)
+            {
+                Debug("Returning from cache");
+                return mCachedMethod;
+            }
             var xResult = mDebugInfoDb.Connection.Get<Method>(aMethodId);
             Debug("Method.LabelCall = '{0}'", xResult.LabelCall);
+            mCachedMethod = xResult;
             return xResult;
         }
 
+        private LOCAL_ARGUMENT_INFO[] mCachedAllLocalsAndArgumentsInfosByMethodLabelName;
+        private string mCachedAllLocalsAndArgumentsInfosByMethodLabelNameValue;
         public LOCAL_ARGUMENT_INFO[] GetAllLocalsAndArgumentsInfosByMethodLabelName(string aLabelName)
         {
             Debug("GetAllLocalsAndArgumentsInfosByMethodLabelName. LabelName = '{0}'", aLabelName);
+            if (StringComparer.OrdinalIgnoreCase.Equals(aLabelName, mCachedAllLocalsAndArgumentsInfosByMethodLabelNameValue))
+            {
+                Debug("Returning from cache");
+                return mCachedAllLocalsAndArgumentsInfosByMethodLabelName;
+            }
+
             var xResult = mDebugInfoDb.Connection.Query<LOCAL_ARGUMENT_INFO>(new SQLinq<LOCAL_ARGUMENT_INFO>().Where(q => q.METHODLABELNAME == aLabelName)).ToArray();
+            mCachedAllLocalsAndArgumentsInfosByMethodLabelNameValue = aLabelName;
+            mCachedAllLocalsAndArgumentsInfosByMethodLabelName = xResult;
             Debug("Result.Count = {0}", xResult.Length);
             return xResult;
         }
 
+        private long? mCachedDocumentIdByName;
+        private string mCachedDocumentIdByNameValue;
         public bool TryGetDocumentIdByName(string aDocumentName, out long oDocumentId)
         {
             Debug("TryGetDocumentIdByName. DocumentName = '{0}'", aDocumentName);
+            if (String.Equals(mCachedDocumentIdByNameValue, aDocumentName, StringComparison.OrdinalIgnoreCase))
+            {
+                Debug("Returning from cache");
+                oDocumentId = mCachedDocumentIdByName.GetValueOrDefault();
+                return mCachedDocumentIdByName.HasValue;
+            }
             var xResult = mDebugInfoDb.DocumentGUIDs.TryGetValue(aDocumentName, out oDocumentId);
+            mCachedDocumentIdByNameValue = aDocumentName;
+            mCachedDocumentIdByName = oDocumentId;
             Debug("Result = {0}, DocumentId = {1}", xResult, oDocumentId);
             return xResult;
         }

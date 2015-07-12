@@ -101,7 +101,7 @@ namespace Cosmos.Debug
             mDbgConnector.CmdChannel += DbgCmdChannel;
         }
 
-        //private readonly StreamWriter mOut = new StreamWriter(@"c:\data\CosmosDebugController.log", true);
+        private readonly StreamWriter mOut = new StreamWriter(@"c:\data\CosmosDebugController.log", true);
 
         private void Debug(string message, params object[] args)
         {
@@ -114,8 +114,8 @@ namespace Cosmos.Debug
             DbgCmdText("DEBUG: "+ message);
 
             var x = DateTime.Now.ToString("HH:mm:ss.ffffff ") + message;
-            //mOut.WriteLine(x);
-            //mOut.Flush();
+            mOut.WriteLine(x);
+            mOut.Flush();
         }
     }
 }
