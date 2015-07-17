@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseBreakpointManager.cs" />
+    <Compile Include="CacheHelper.cs" />
     <Compile Include="DebugController.cs" />
     <Compile Include="DebugController.DebugConnector.cs">
       <DependentUpon>DebugController.cs</DependentUpon>

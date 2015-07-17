@@ -32,6 +32,7 @@ namespace Cosmos.Debug
             mDebugInfoDb = new DebugInfo(DebugInfoPath);
             mDebugInfoDb.LoadLookups();
             CreateDebugConnector();
+            InitializeCache();
         }
 
         public void Dispose()
@@ -105,7 +106,7 @@ namespace Cosmos.Debug
 
         private void Debug(string message, params object[] args)
         {
-            //Debug(String.Format(message, args));
+            Debug(String.Format(message, args));
         }
 
         private void Debug(string message)
