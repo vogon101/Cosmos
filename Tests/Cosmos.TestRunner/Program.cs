@@ -26,9 +26,9 @@ namespace Cosmos.TestRunner.Console
             xEngine.Execute();
 
             global::System.Console.WriteLine("Do you want to save test run details?");
-            global::System.Console.Write("Type yes, or nothing to just exit: ");
+            global::System.Console.Write("Type y(es), or nothing to just exit: ");
             var xResult = global::System.Console.ReadLine();
-            if (xResult != null && xResult.Equals("yes", StringComparison.OrdinalIgnoreCase))
+            if (xResult != null && (xResult.Equals("yes", StringComparison.OrdinalIgnoreCase) || xResult.Equals("y", StringComparison.OrdinalIgnoreCase)))
             {
                 var xSaveDialog = new SaveFileDialog();
                 xSaveDialog.Filter = "XML documents|*.xml";
