@@ -88,7 +88,6 @@ namespace Cosmos.System {
             for (int i = 0; i < aText.Length; i++) {
                 if (aText[i] == '\n') {
                     NewLine();
-                    WriteChar('\n');
                 } else if (aText[i] == '\r') {
                 } else if (aText[i] == '\t') {
                     Write("    ");
@@ -107,6 +106,23 @@ namespace Cosmos.System {
         {
             get { return (ConsoleColor)(mText.GetColor() >> 4); }
             set { mText.SetColors(Foreground, value); }
+        }
+
+        public int CursorSize
+        {
+            get { return mText.GetCursorSize(); }
+            set {
+                // Value should be a percentage from [1, 100].
+                if (value < 1 || value > 100)
+                    throw new ArgumentOutOfRangeException("value", value, "CursorSize value " + value + " out of range (1 - 100)");
+
+                mText.SetCursorSize(value);
+            }
+        }
+
+        public bool CursorVisible {
+            get { return mText.GetCursorVisible(); } 
+            set { mText.SetCursorVisible(value);  }
         }
     }
 }

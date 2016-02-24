@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.System.Plugs.System
@@ -12,7 +9,27 @@ namespace Cosmos.System.Plugs.System
     {
         public static void Cctor()
         {
-            //
+        }
+
+        public static bool IsDigit(char aChar)
+        {
+            return (aChar >= '0' && aChar <= '9');
+        }
+
+        public static bool IsDigit(string aString, int aIndex)
+        {
+            if (aString == null)
+            {
+                throw new ArgumentNullException("aString");
+            }
+
+            if (((uint)aIndex) >= ((uint)aString.Length))
+            {
+                throw new ArgumentOutOfRangeException("aIndex");
+            }
+
+            char c = aString[aIndex];
+            return (c >= '0' && c <= '9');
         }
 
         public static string ToString(ref char aThis)
