@@ -535,14 +535,14 @@ namespace Cosmos.IL2CPU.ILOpCodes {
               return;
             }
 
-            if ((StackPopTypes[0] == typeof (IntPtr) && StackPopTypes[1] == typeof (UInt32*))
+            if ((StackPopTypes[0] == typeof (IntPtr) && StackPopTypes[1] == typeof (uint*))
               || (StackPopTypes[0] == typeof (uint*) && StackPopTypes[1] == typeof (IntPtr)))
             {
               StackPushTypes[0] = typeof (uint*);
               aSituationChanged = true;
               return;
             }
-            if ((StackPopTypes[0] == typeof(UIntPtr) && StackPopTypes[1] == typeof(UInt32*))
+            if ((StackPopTypes[0] == typeof(UIntPtr) && StackPopTypes[1] == typeof(uint*))
               || (StackPopTypes[0] == typeof(uint*) && StackPopTypes[1] == typeof(UIntPtr)))
             {
               StackPushTypes[0] = typeof(uint*);
@@ -663,7 +663,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
             }
             if (StackPopTypes[0] == typeof(IntPtr) && StackPopTypes[1] == typeof(IntPtr))
             {
-              StackPushTypes[0] = typeof(uint);
+              StackPushTypes[0] = typeof(IntPtr);
               aSituationChanged = true;
               return;
             }
@@ -729,6 +729,14 @@ namespace Cosmos.IL2CPU.ILOpCodes {
               aSituationChanged = true;
               return;
             }
+
+            if ((StackPopTypes[0] == typeof(int) && StackPopTypes[1] == typeof(sbyte))
+             || (StackPopTypes[0] == typeof(sbyte) && StackPopTypes[1] == typeof(int)))
+            {
+              StackPushTypes[0] = typeof(int);
+              aSituationChanged = true;
+              return;
+            }
             if (StackPopTypes[0] == StackPopTypes[1] && StackPopTypes[0].IsPointer)
             {
               StackPushTypes[0] = StackPopTypes[0];
@@ -749,7 +757,6 @@ namespace Cosmos.IL2CPU.ILOpCodes {
               aSituationChanged = true;
               return;
             }
-
             if (OpCode == Code.Add &&
                 ((StackPopTypes[0] == typeof(IntPtr) && (StackPopTypes[1].IsPointer || StackPopTypes[1].IsByRef))
                  || ((StackPopTypes[0].IsPointer || StackPopTypes[0].IsByRef) && StackPopTypes[1] == typeof(IntPtr))))
@@ -869,6 +876,18 @@ namespace Cosmos.IL2CPU.ILOpCodes {
             StackPushTypes[0] = typeof(ulong);
             aSituationChanged = true;
             return;
+          }
+          if (xTypeValue == typeof(sbyte) && xTypeShift == typeof(int))
+          {
+            StackPushTypes[0] = typeof(int);
+            aSituationChanged = true;
+            return;
+          }
+          if (xTypeValue == typeof(short) && xTypeShift == typeof(int))
+          {
+             StackPushTypes[0] = typeof(int);
+             aSituationChanged = true;
+             return;
           }
           throw new NotImplementedException(String.Format("{0} with types {1} and {2} is not implemented!", OpCode, xTypeValue.FullName, xTypeShift.FullName));
         case Code.Ldelem_Ref:
